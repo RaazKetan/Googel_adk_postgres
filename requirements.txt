@@ -22,7 +22,7 @@ typing-extensions>=4.8.0
 pydantic>=2.0.0
 requests>=2.31.0
 deprecated
-
+psycopg2-binary
 
 # Note: Exact versions may vary based on your Python version and system
 # If you encounter version conflicts, try installing without version constraints first:

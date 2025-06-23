@@ -12,174 +12,203 @@ This app is a smart chat interface powered by **Google Agent Development Kit (AD
 - `"Update John's React experience to 3 years"`
 - `"Delete employee John"`
 - `"Show all employee data"`
-
 ---
 
-## 🧠 Features
+## ✨ Features
 
-- 🗣 Natural language control via Gemini
-- 🧩 Uses Google ADK with custom tool (`run_sql_query`)
-- 🛢 PostgreSQL for employee data storage
-- 🎨 Streamlit-based UI with chat + data table
-- 📦 Modular Python structure (separates agent, DB, and UI logic)
+* **Add Employees & Skills:** Easily add new employees and their associated tech skills with years of experience.
+* **Update Skills:** Modify existing employee skills (e.g., update experience years for a specific tech).
+* **Delete Employees:** Remove employees and their related skills from the database.
+* **Query & Search:** Retrieve employee information and search for employees based on their tech stack.
+* **Natural Language Interface:** Interact with the database using conversational English.
 
----
+## 🚀 Getting Started
 
-## 📁 Folder Structure
+Follow these steps to set up and run the Employee Skill Assistant on your local machine.
 
-```
+### Prerequisites
 
-employee\_skill\_assistant/
-├── .env                     # Environment variables
-├── README.md
-├── app.py                   # Streamlit UI app
-├── agent.py                 # Agent + run\_sql\_query tool
-├── db.py                    # PostgreSQL connection helper
-├── create\_tables.py         # Creates employee tables in DB
-├── requirements.txt
+Before you begin, ensure you have the following installed:
+* ``` pip install -r requirements.txt ```
+* **Python 3.9+**
+* **pip** (Python package installer)
+* **PostgreSQL Database Server**
+* **pgAdmin 4** (Recommended for managing your PostgreSQL database visually)
+* **Visual Studio Code (VS Code)** (Recommended IDE)
+* **Google Gemini API Key**
 
-````
+### 1. Database Setup (PostgreSQL)
 
----
+This application uses a PostgreSQL database to store employee and skill data.
 
-## ⚙️ Prerequisites
+#### 1.1 Install PostgreSQL
 
-1. **Python 3.9+**
-2. **PostgreSQL installed & running**
-3. A **Gemini API Key** from Google AI Studio
+If you don't have PostgreSQL installed, download and install it from the official website:
+[PostgreSQL Downloads](https://www.postgresql.org/download/)
 
----
+During installation, you will be asked to set a password for the `postgres` superuser. Remember this password, as you'll need it later.
 
-## 🧪 Installation & Setup
+#### 1.2 Install pgAdmin 4 (Recommended)
 
-### 1. 🔁 Clone the Repo
+pgAdmin 4 provides a user-friendly web interface for managing your PostgreSQL databases.
+Download and install it from here: [pgAdmin Downloads](https://www.pgadmin.org/download/)
 
-```bash
-git clone https://github.com/YOUR_USERNAME/employee_skill_assistant.git
-cd employee_skill_assistant
-````
+#### 1.3 Create the Database
 
----
+You need to create a database named `employee_db` (or whatever you prefer, just ensure it matches your `.env` file).
 
-### 2. 🐍 Create Virtual Environment
+**Using pgAdmin 4:**
+1.  Open pgAdmin 4.
+2.  In the left sidebar, expand "Servers" and click on "PostgreSQL X (Version Number)".
+3.  Enter the `postgres` superuser password you set during installation to connect.
+4.  Right-click on "Databases" -> "Create" -> "Database...".
+5.  In the "General" tab, enter `employee_db` as the "Database" name.
+6.  Click "Save".
 
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+**Using `psql` (Command Line):**
+1.  Open your terminal or command prompt.
+2.  Connect to PostgreSQL as the `postgres` superuser:
+    ```bash
+    psql -U postgres
+    ```
+    (Enter your `postgres` password when prompted)
+3.  Create the database:
+    ```sql
+    CREATE DATABASE employee_db;
+    \q
+    ```
 
----
+**Using `psql` (Command Line):**
+1.  Connect to PostgreSQL as the `postgres` superuser:
+    ```bash
+    psql -U postgres
+    ```
+2.  Create the user and set a password:
+    ```sql
+    CREATE USER app_user WITH PASSWORD 'your_secure_password';
+    ```
+3.  Grant privileges on your database:
+    ```sql
+    GRANT ALL PRIVILEGES ON DATABASE employee_db TO app_user;
+    \q
+    ```
 
-### 3. 📦 Install Dependencies
+### 2. VS Code Setup (Optional but Recommended)
 
-```bash
-pip install -r requirements.txt
-```
+VS Code offers excellent extensions for Python and PostgreSQL.
 
----
+1.  **Install Python Extension:** Search for "Python" by Microsoft in the Extensions view (`Ctrl+Shift+X` or `Cmd+Shift+X`) and install it.
+2.  **Install PostgreSQL Extension:** Search for "PostgreSQL" by Microsoft and install it.
+    * Once installed, you can click the Elephant icon in the Activity Bar (left sidebar).
+    * Click the "+" button to add a new connection.
+    * Enter the connection details for your `employee_db` (Host: `localhost`, User: `app_user` (or `postgres`), Password: `your_password`, Database: `employee_db`, Port: `5432`).
+    * This allows you to browse your database tables directly within VS Code and run SQL queries.
 
-### 4. 🔐 Configure Environment Variables
+### 3. Project Setup
 
-Create a `.env` file in the root directory:
+1.  **Clone the Repository (if applicable) or create the project structure:**
+    ```
+    .
+    ├── .env
+    ├── app.py
+    ├── core/
+    │   ├── __init__.py
+    │   ├── adk_config.py
+    │   ├── db_operations.py
+    │   └── adk_utils.py
+    └── ui/
+        ├── __init__.py
+        └── streamlit_ui.py
+    ```
 
-```env
-# .env
-GOOGLE_GENAI_USE_VERTEXAI=FALSE
-GOOGLE_API_KEY=your_gemini_api_key_here
+2.  **Create a Virtual Environment (Recommended):**
+    Navigate to your project's root directory in the terminal and run:
+    ```bash
+    python -m venv venv
+    ```
 
+3.  **Activate the Virtual Environment:**
+    * **Windows:**
+        ```bash
+        .\venv\Scripts\activate
+        ```
+    * **macOS/Linux:**
+        ```bash
+        source venv/bin/activate
+        ```
+
+4.  **Install Dependencies:**
+    With your virtual environment activated, install the required Python packages:
+    ```bash
+    pip install streamlit google-generativeai python-dotenv psycopg2-binary google-adk
+    ```
+    *(Note: `google-adk` might have specific installation instructions; refer to its documentation if `pip install` fails.)*
+
+### 4. Configure Environment Variables (`.env`)
+
+Create a file named `.env` in the root directory of your project. Copy the following content and fill in your actual values:
+
+```dotenv
+# Google Generative AI Configuration (for Gemini API)
+# Find your API Key at Google AI Studio: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+GOOGLE_API_KEY='YOUR_GOOGLE_GEMINI_API_KEY'
+
+# If using Vertex AI (optional, leave blank otherwise)
+# GOOGLE_GENAI_USE_VERTEXAI=True
+# GOOGLE_CLOUD_PROJECT=your-gcp-project-id
+# GOOGLE_CLOUD_LOCATION=us-central1 # e.g., us-central1
+
+# PostgreSQL Database Configuration
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_DB=employee_db
-POSTGRES_USER=your_db_user
-POSTGRES_PASSWORD=your_db_password
-```
+POSTGRES_USER=app_user # Or 'postgres' if you're using the default superuser
+POSTGRES_PASSWORD=your_secure_password # The password for the user above
+````
 
----
+**Important:**
+  * Replace `app_user` and `your_secure_password` with the credentials for the PostgreSQL user you created (or `postgres` and its password if you're using the default).
+  * Ensure `POSTGRES_DB` matches the database name you created (`employee_db`).
 
-### 5. 🏗️ Create the Database Tables
+### 5\. Initialize Database Tables
 
-Ensure PostgreSQL is running, then run:
+Before running the application, you need to create the necessary tables in your PostgreSQL database.
+
+Navigate to your project's root directory in the terminal (with the virtual environment activated) and run:
 
 ```bash
-python create_tables.py
+python3 core/db_operations.py
 ```
 
-This will create:
+This script will connect to your PostgreSQL database (using the credentials from `.env`) and create the `employees` and `employee_skills` tables if they don't already exist.
 
-* `employees(id SERIAL PRIMARY KEY, name TEXT NOT NULL)`
-* `employee_skills(id SERIAL PRIMARY KEY, employee_id INT REFERENCES employees(id), tech TEXT NOT NULL, experience_years NUMERIC NOT NULL)`
+### 6\. Run the Application
 
----
-
-### 6. 🚀 Start the App
+Finally, start the Streamlit application:
 
 ```bash
 streamlit run app.py
 ```
 
-The app will open in your browser. Chat with it directly!
+Your browser should automatically open to the Streamlit application (usually `http://localhost:8501`).
 
----
+## 💬 How to Interact
 
-## 💬 Sample Prompts
+Once the application is running, you can use the chat interface to manage employee data:
 
-> ✅ These all work as natural language prompts:
+  * **Add an employee and their skills:**
+    `Add John with 2 years React and 1 year Python`
+  * **Update an employee's skill:**
+    `Update John's React experience to 3 years`
+  * **Delete an employee:**
+    `Delete John`
+  * **View an employee's skills:**
+    `Show me John's skills`
+    `What is Jane's tech stack?`
+  * **Query for employees with certain skills:**
+    `Who knows Python?`
+    `Find employees with more than 2 years of Java experience`
 
-| Action          | Example Prompt                                        |
-| --------------- | ----------------------------------------------------- |
-| Add employee    | `Add Alice with 3 years in Node.js and 1 year in SQL` |
-| View all        | `Show me all employee data`                           |
-| Update stack    | `Change Alice's Node.js experience to 4 years`        |
-| Delete employee | `Remove Alice from the system`                        |
+Enjoy managing your employee skills with this AI assistant\!
 
----
-
-## 🧠 How It Works
-
-### Agent Instruction
-
-A powerful `LlmAgent` is configured with this instruction:
-
-> “Use only `run_sql_query()` to insert, update, delete or query employee and skills data from the PostgreSQL DB. Fetch `employee_id` when needed. Never assume data — ask the user to clarify.”
-
-### run\_sql\_query Tool
-
-```python
-def run_sql_query(tool_context, query: str) -> Dict:
-    # Executes SELECT / INSERT / UPDATE / DELETE SQL
 ```
-
-It uses `psycopg2` and converts any `Decimal` values to `float` to ensure JSON safety.
-
----
-
-## 🐛 Common Errors
-
-| Error                                             | Fix                                                             |
-| ------------------------------------------------- | --------------------------------------------------------------- |
-| `Object of type Decimal is not JSON serializable` | Fixed by converting `Decimal → float` in query results          |
-| `cursor is not a context manager`                 | Use `with conn.cursor() as cur:` not `with conn.cursor as cur:` |
-| `Session not found`                               | Restart Streamlit to reinitialize the ADK session               |
-| `KeyError` on env                                 | Double-check `.env` is created and `load_dotenv()` is called    |
-
----
-
-## ✨ Optional Enhancements
-
-* [ ] Add login/authentication
-* [ ] Store query logs
-* [ ] Export results to CSV
-* [ ] Deploy with Docker
-
----
-
-## 🤝 Credits
-
-* [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
-* [Gemini 2.5](https://ai.google.dev/)
-* [Streamlit](https://streamlit.io/)
-* [PostgreSQL](https://www.postgresql.org/)
-* Inspired by developer @ketanraj's ADK experiments 🚀
-
----
-
